@@ -1,0 +1,591 @@
+
+Цель работы: практическое освоение команд SELECT, INSERT, UPDATE и DELETE;
+работа со строковыми функциями MySQL и функциями для работы с датой и временем.
+
+​1) Создайте три таблицы в новой базе данных. 
+
+SQL – скрипт: 
+
+Создание таблицы Продавец (Seller)
+
+#+begin_src sql
+  create table Seller
+  (
+      id_sell     int primary key not null,
+      last_name   varchar(80) not null,
+      first_name  varchar(80) not null,
+      second_name varchar(80) not null,
+      city_sell   varchar(30),
+      head        varchar(40),
+      comm_sell   decimal,
+      sales_plan  int
+  );
+
+#+end_src
+
+Создание таблицы Заказчик (Customer)
+
+#+begin_src sql
+  create table Customer
+  (
+      id_cust     int primary key not null,
+      last_name   varchar(80) not null,
+      first_name  varchar(80) not null,
+      second_name varchar(80) not null,
+      city_cust   varchar(30),
+      rate_cust   int,
+      credit      int
+  );
+
+#+end_src
+
+
+Создание таблицы Заказ (Order)
+
+#+begin_src sql
+create table shop.`order`
+(
+    id_order    int primary key not null,
+    sum_order   decimal,
+    date_order  datetime,
+    id_sell     int      not null,
+    id_customer int      not null,
+    constraint order_customer_null_fk
+        foreign key (id_customer) references shop.customer (id_cust),
+    constraint order_seller_null_fk
+        foreign key (id_sell) references shop.seller (id_sell)
+);
+#+end_src
+
+​2) Используйте следующий SQL-скрипт для заполнения таблиц. 
+
+
+#+begin_src sql
+INSERT INTO shop.seller (id_sell, last_name, first_name, second_name, city_sell, head, comm_sell, sales_plan)
+VALUES (2, 'Приморская', 'Алина', 'Петровна', 'Москва', 'Талимов Е.Е.', 18, 150);
+
+
+INSERT INTO shop.seller (id_sell, last_name, first_name, second_name, city_sell, head, comm_sell, sales_plan)
+VALUES (3, 'Петухов', 'Игорь', 'Максимович', 'Екатеринбург', 'Федулов А.С.', 18, 300);
+
+INSERT INTO shop.seller (id_sell, last_name, first_name, second_name, city_sell, head, comm_sell, sales_plan)
+VALUES (4, 'Терехова', 'Нина', 'Семеновна', 'Москва', 'Рахимов П.Г.', 18, 100);
+
+
+INSERT INTO shop.seller (id_sell, last_name, first_name, second_name, city_sell, head, comm_sell, sales_plan)
+VALUES (5, 'Никифорова', 'Анастасия', 'Петровна', 'Екатеринбург', 'Федулов А.С.', 18, 200);
+#+end_src
+
+
+#+CAPTION: Таблица продавцов
+[[file:images/20230123-142615_screenshot.png]]
+
+
+#+begin_src sql
+INSERT INTO customer (id_cust, last_name, first_name, second_name, city_cust, rate_cust, credit)
+VALUES (1, 'Петров', 'Олег', 'Дмитриевич', 'Магадан', 83, 150000);
+INSERT INTO customer (id_cust, last_name, first_name, second_name, city_cust, rate_cust, credit)
+VALUES (2, 'Антипов', 'Валерий', 'Петрович', 'Екатеринбург', 45, 75000);
+INSERT INTO customer (id_cust, last_name, first_name, second_name, city_cust, rate_cust, credit)
+VALUES (3, 'Берегов', 'Владимир', 'Евгеньевич', 'Москва', 96, 500000);
+INSERT INTO customer (id_cust, last_name, first_name, second_name, city_cust, rate_cust, credit)
+VALUES (4, 'Чернов', 'Антон', 'Петрович', 'Тула', 62, 100000);
+INSERT INTO customer (id_cust, last_name, first_name, second_name, city_cust, rate_cust, credit)
+VALUES (5, 'Голубев', 'Иосиф', 'Николаевич', 'Тбилиси', 78, 120000);
+INSERT INTO customer (id_cust, last_name, first_name, second_name, city_cust, rate_cust, credit)
+VALUES (6, 'Романов', 'Глеб', 'Иванович', 'Екатеринбург', 91, 270000);
+#+end_src
+
+#+CAPTION: Таблица заказчиков
+[[file:images/20230123-143345_screenshot.png]]
+
+#+begin_src sql
+INSERT INTO shop.`order`(id_order, sum_order, date_order, id_sell, id_customer)
+VALUES (1, 50000, '2010.06.12', 2, 2);
+INSERT INTO shop.`order`(id_order, sum_order, date_order, id_sell, id_customer)
+VALUES (2, 30000, '2010.06.12', 2, 2);
+INSERT INTO shop.`order`(id_order, sum_order, date_order, id_sell, id_customer)
+VALUES (3, 70000, '2010.06.13', 2, 1);
+INSERT INTO shop.`order`(id_order, sum_order, date_order, id_sell, id_customer)
+VALUES (4, 60000, '2010.06.13', 5, 1);
+INSERT INTO shop.`order`(id_order, sum_order, date_order, id_sell, id_customer)
+VALUES (5, 35000, '2010.06.14', 4, 5);
+INSERT INTO shop.`order`(id_order, sum_order, date_order, id_sell, id_customer)
+VALUES (6, 70000, '2010.06.14', 4, 3);
+#+end_src
+
+#+CAPTION: Таблица заказов
+[[file:images/20230123-154749_screenshot.png]]
+
+
+Создайте и выполните следующие запросы к созданным таблицам
+
+​1. Напишите запрос, который вывел бы все строки из таблицы “Заказчики”, для которых номер заказчика =5.
+
+  #+begin_src sql :engine mysql :database shop
+    SELECT * FROM customer WHERE id_cust = 5;
+  #+end_src
+
+#+RESULTS:
+| id_cust | last_name | first_name | second_name | city_cust | rate_cust | credit |
+|---------+-----------+------------+-------------+-----------+-----------+--------|
+|       5 | Голубев   | Иосиф      | Николаевич  | Тбилиси   |        78 | 120000 |
+
+#+ATTR_LATEX: :width 5cm
+#+CAPTION: Результат выполнения запроса №1
+[[file:images/20230123-152327_screenshot.png]]
+ 
+​2. Напишите запрос, который вывел бы коды всех продавцов в текущем порядке из таблицы “Заказы”, без каких бы то ни было повторений.
+
+#+begin_src sql :engine mysql :database shop
+SELECT distinct id_sell FROM `order`; 
+#+end_src
+
+#+RESULTS:
+| id_sell |
+|---------|
+|       2 |
+|       4 |
+|       5 |
+
+#+ATTR_LATEX: :width 5cm
+#+CAPTION: Результат выполнения запроса № 2
+[[file:images/20230123-153207_screenshot.png]]
+​3. Напишите запрос к таблице “Заказчики”, который содержит всех заказчиков с рейтингом  < 100, если они не находятся в Москве.
+
+#+begin_src sql :engine mysql :database shop
+SELECT * FROM customer WHERE rate_cust < 100 AND city_cust != 'Москва';
+#+end_src
+
+#+RESULTS:
+| id_cust | last_name | first_name | second_name | city_cust    | rate_cust | credit |
+|---------+-----------+------------+-------------+--------------+-----------+--------|
+|       1 | Петров    | Олег       | Дмитриевич  | Магадан      |        83 | 150000 |
+|       2 | Антипов   | Валерий    | Петрович    | Екатеринбург |        45 |  75000 |
+|       4 | Чернов    | Антон      | Петрович    | Тула         |        62 | 100000 |
+|       5 | Голубев   | Иосиф      | Николаевич  | Тбилиси      |        78 | 120000 |
+|       6 | Романов   | Глеб       | Иванович    | Екатеринбург |        91 | 270000 |
+
+#+CAPTION: Результат выполнения запроса № 3
+[[file:images/20230123-153812_screenshot.png]]
+​4. Напишите запрос, который мог бы вывести все заказы на 12 или 13 июня.
+
+#+begin_src sql :engine mysql :database shop
+SELECT * FROM `order` WHERE MONTH(date_order) = 6 AND (DAYOFMONTH(date_order) = 12 OR DAYOFMONTH(date_order) = 13);
+#+end_src
+
+#+RESULTS:
+| id_order | sum_order | date_order          | id_sell | id_customer |
+|----------+-----------+---------------------+---------+-------------|
+|        1 |     50000 | 2010-06-12 00:00:00 |       2 |           2 |
+|        2 |     30000 | 2010-06-12 00:00:00 |       2 |           2 |
+|        3 |     70000 | 2010-06-13 00:00:00 |       2 |           1 |
+|        4 |     60000 | 2010-06-13 00:00:00 |       5 |           1 |
+
+#+CAPTION: Результат выполнения запроса № 4
+[[file:images/20230123-154817_screenshot.png]]
+
+​5. Напишите запрос, который выбрал бы наименьшую сумму для каждого заказчика
+
+#+begin_src sql :engine mysql :database shop
+SELECT CONCAT(c.last_name, " ", c.first_name, " ", c.second_name) AS 'ФИО', MIN(sum_order)  FROM `order` JOIN customer c ON c.id_cust = `order`.id_customer GROUP BY id_customer
+#+end_src
+
+#+RESULTS:
+| ФИО                         | MIN(sum_order) |
+|-----------------------------+----------------|
+| Антипов Валерий Петрович    |          30000 |
+| Петров Олег Дмитриевич      |          60000 |
+| Голубев Иосиф Николаевич    |          35000 |
+| Берегов Владимир Евгеньевич |          70000 |
+
+#+CAPTION: Результат запроса № 5
+[[file:images/20230123-155515_screenshot.png]]
+
+​6. Напишите запрос, который выбрал бы высший рейтинг в каждом городе.
+
+#+begin_src sql :engine mysql :database shop
+  SELECT city_cust as 'Город', MAX(rate_cust) AS 'Рейтинг' FROM customer GROUP BY city_cust; 
+#+end_src
+
+#+RESULTS:
+| Город        | Рейтинг |
+|--------------+---------|
+| Магадан      |      83 |
+| Екатеринбург |      91 |
+| Москва       |      96 |
+| Тула         |      62 |
+| Тбилиси      |      78 |
+
+#+CAPTION: Результат работы запроса № 6
+[[file:images/20230123-160000_screenshot.png]]
+
+​7. Напишите запрос, который бы выводил всех заказчиков, обслуживаемых продавцом с комиссионными выше 12%.
+Выведите имя заказчика, имя   продавца, и ставку комиссионных продавца.
+
+#+begin_src sql :engine mysql :database shop
+SELECT CONCAT_WS(' ', c.last_name, c.first_name, c.second_name) AS 'Имя заказчика',
+       CONCAT_WS(' ', s.last_name, s.first_name, s.second_name) AS 'Имя продавца',
+       s.comm_sell
+FROM `order`
+         JOIN customer c ON c.id_cust = id_customer
+         JOIN seller s on s.id_sell = `order`.id_sell AND s.comm_sell > 12;
+#+end_src
+
+#+RESULTS:
+| Имя заказчика               | Имя продавца                  | comm_sell |
+|-----------------------------+-------------------------------+-----------|
+| Антипов Валерий Петрович    | Приморская Алина Петровна     |        18 |
+| Антипов Валерий Петрович    | Приморская Алина Петровна     |        18 |
+| Петров Олег Дмитриевич      | Приморская Алина Петровна     |        18 |
+| Голубев Иосиф Николаевич    | Терехова Нина Семеновна       |        18 |
+| Берегов Владимир Евгеньевич | Терехова Нина Семеновна       |        18 |
+| Петров Олег Дмитриевич      | Никифорова Анастасия Петровна |        18 |
+
+#+CAPTION: Результаты выполнения запроса № 7
+[[file:images/20230123-161704_screenshot.png]]
+
+​8. Напишите запрос, который вычислил бы сумму комиссионных продавца для каждого заказа заказчика с рейтингом выше 80.
+
+#+begin_src sql :engine mysql :database shop
+  SELECT CONCAT_WS(' ', c.last_name, c.first_name, c.second_name) AS 'Заказчик',
+	 SUM(s.sales_plan * (s.comm_sell / 100)) as 'Сумма комиссионных'
+  FROM `order`
+	   JOIN seller s on s.id_sell = `order`.id_sell
+	   JOIN customer c on c.id_cust = `order`.id_customer
+      AND c.rate_cust > 80
+  GROUP BY id_customer;
+#+end_src
+
+#+RESULTS:
+| Заказчик                    | Сумма комиссионных |
+|-----------------------------+--------------------|
+| Петров Олег Дмитриевич      |            63.0000 |
+| Берегов Владимир Евгеньевич |            18.0000 |
+
+#+CAPTION: Результат выполнения запроса № 8
+[[file:images/20230123-214719_screenshot.png]]
+
+
+​9. Напишите запрос, который бы выбрал общую сумму всех заказов для каждого продавца,
+у которого эта общая сумма больше, чем сумма наибольшего заказа в таблице “Заказы”.
+
+#+begin_src sql  :engine mysql :database shop
+  SELECT CONCAT_WS(' ', s.last_name, s.first_name, s.second_name) AS 'Продавец', sum(sum_order)  FROM `order`
+	 JOIN seller s ON s.id_sell = `order`.id_sell GROUP by s.id_sell HAVING sum(sum_order) > max(sum_order);
+#+end_src
+
+#+RESULTS:
+| Продавец                  | sum(sum_order) |
+|---------------------------+----------------|
+| Приморская Алина Петровна |         150000 |
+| Терехова Нина Семеновна   |         105000 |
+
+#+CAPTION: Результат запроса №9
+[[file:images/20230123-220018_screenshot.png]]
+
+
+​10. Напишите команду SELECT, использующую подзапрос,
+которая выберет фамилии и коды всех заказчиков с максимальными для их городов рейтингами.
+
+#+begin_src sql :engine mysql :database shop
+SELECT id_cust, last_name
+FROM customer cust1
+WHERE rate_cust = (SELECT MAX(rate_cust) FROM customer cust2 WHERE cust1.city_cust = cust2.city_cust);
+#+end_src
+
+#+RESULTS:
+| id_cust | last_name |
+|---------+-----------|
+|       1 | Петров    |
+|       3 | Берегов   |
+|       4 | Чернов    |
+|       5 | Голубев   |
+|       6 | Романов   |
+
+#+CAPTION: Результат запроса № 10
+[[file:images/20230123-220508_screenshot.png]]
+
+​11. Напишите запрос, который выберет всех продавцов (по их фамилии и коду),
+имеющих в своих городах заказчиков, которых они не обслуживают.
+
+#+begin_src sql :engine mysql :database shop
+SELECT DISTINCT s.id_sell, s.last_name
+FROM customer
+         JOIN seller s on s.city_sell = city_cust
+WHERE NOT EXISTS(SELECT o.id_order FROM `order` o WHERE o.id_sell = s.id_sell AND o.id_customer = customer.id_cust);
+#+end_src
+
+#+RESULTS:
+| id_sell | last_name  |
+|---------+------------|
+|       3 | Петухов    |
+|       4 | Терехова   |
+|       2 | Приморская |
+
+#+CAPTION: Результат выполнения запроса № 11
+[[file:images/20230124-121259_screenshot.png]]
+
+
+​12. Напишите запрос для извлечения всех продавцов, которые имеют заказчиков с рейтингом 45.
+
+#+begin_src sql :engine mysql :database shop
+  SELECT DISTINCT CONCAT_WS(' ', s.last_name, s.first_name, s.second_name) AS 'Продавец' FROM `order` JOIN seller s ON s.id_sell = `order`.id_sell
+	  JOIN customer c ON c.id_cust = id_customer AND c.rate_cust > 45;
+#+end_src
+
+#+RESULTS:
+| Продавец                      |
+|-------------------------------|
+| Приморская Алина Петровна     |
+| Никифорова Анастасия Петровна |
+| Терехова Нина Семеновна       |
+
+#+CAPTION: Результат выполнения запроса № 12
+[[file:images/20230124-095408_screenshot.png]]
+
+​13. Напишите команду, которая бы увеличила на двадцать процентов комиссионные всех продавцов,  имеющих план продаж выше, чем 300.
+
+#+begin_src sql :engine mysql :database shop
+UPDATE seller SET comm_sell = comm_sell * 2 WHERE sales_plan > 300;
+#+end_src
+
+#+RESULTS:
+|---|
+
+Так как у нас в таблице не было значений комиссионных больше 300, то ничего не изменилось.
+
+​14. Напишите команду, которая бы удалила все заказы заданного заказчика из таблицы “Заказы”.
+
+#+begin_src sql :engine mysql :database shop
+DELETE FROM `order` WHERE id_customer = (SELECT id_cust FROM customer WHERE last_name = 'Берегов');
+#+end_src
+
+#+RESULTS:
+|---|
+
+
+#+CAPTION: Таблица до запроса 14
+[[file:images/20230124-100354_screenshot.png]]
+
+#+CAPTION: Таблица после запроса 14
+[[file:images/20230124-100541_screenshot.png]]
+
+
+​15. Продавец X оставил компанию. Переназначьте его заказчиков продавцу Y.
+
+#+begin_src sql :engine mysql :database shop
+UPDATE `order` SET id_sell = (SELECT id_sell FROM seller WHERE last_name = "Приморская") WHERE id_sell = 4;
+#+end_src
+
+#+RESULTS:
+|---|
+
+
+#+CAPTION: Таблица до запроса 15
+[[file:images/20230124-100354_screenshot.png]]
+
+#+CAPTION: Таблица после запроса 15
+[[file:images/20230124-101444_screenshot.png]]
+
+** Индивидуальное задание
+
+Создайте и выполните запросы к БД, созданной в лабораторной работе №1(Индивидуальные задания). Запроы должны быть следующих типов: 
+
+2 запроса с подзапросами;
+
+​1. Запрос на нахождения сотрудников одного пола
+#+begin_src sql :engine mysql :database computerserviceooo
+  SELECT id as 'ID', CONCAT_WS(' ', last_name, first_name, second_name) AS 'ФИО' FROM employee
+	 WHERE sex = (SELECT sex.id FROM sex WHERE name = 'Женский');
+#+end_src
+
+#+RESULTS:
+| ID | ФИО                       |
+|----+---------------------------|
+|  3 | Турсунова Лидия Сергеевна |
+
+​2. Запрос на нахождения компонентов, созданных опр. компанией.
+
+#+begin_src sql :engine mysql :database computerserviceooo
+  SELECT * FROM component WHERE manufacturer_id = (SELECT manufacturer.id FROM manufacturer WHERE name = 'AMD');
+#+end_src
+
+#+RESULTS:
+| id | type_id | brand         | manufacturer_id | man_Country | release_date | characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | warranty | description                            | price |
+|----+---------+---------------+-----------------+-------------+--------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+----------------------------------------+-------|
+|  1 |       1 | Ryzen 5 3600x |               2 |           2 |   2022-12-14 | Общие параметры\nМодель\nAMD Ryzen 5 3600X\nСокет\nAM4\nКод производителя\n[100-000000022]\nГод релиза\n2019\nСистема охлаждения в комплекте\nнет\nТермоинтерфейс в комплекте\nнет\nЯдро и архитектура\nОбщее количество ядер\n6\nМаксимальное число потоков \n12\nКоличество производительных ядер \n6\nКоличество энергоэффективных ядер \nнет\nОбъем кэша L2 \n3 МБ\nОбъем кэша L3 \n32 МБ\nТехпроцесс \nTSMC 7FF\nЯдро \nAMD Matisse\nЧастота и возможность разгона\nБазовая частота процессора \n3.8 ГГц\nМаксимальная частота в турбо режиме \n4.4 ГГц\nБазовая частота энергоэффективных ядер\nнет\nЧастота в турбо режиме энергоэффективных ядер\nнет\nСвободный множитель \nесть\nПараметры оперативной памяти\nТип памяти\nDDR4\nМаксимально поддерживаемый объем памяти\n128 ГБ\nКоличество каналов \n2\nМаксимальная частота оперативной памяти \n3200 МГц\nПоддержка режима ECC \nесть\nТепловые характеристики\nТепловыделение (TDP)\n95 Вт\nБазовое тепловыделение\n95 Вт\nМаксимальная температура процессора \n95 °C\nГрафическое ядро\nИнтегрированное графическое ядро\nнет\nШина и контроллеры\nВстроенный контроллер PCI Express \nPCI-E 4.0\nЧисло линий PCI Express \n16 шт | 1 год    | Хороший процессор для игр и для работы | 15000 |
+|  8 |       2 | АААА          |               2 |           2 |   2020-12-22 | АААА                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | АААА     | ААААА                                  | 10000 |
+
+
+2 запроса на добавление;
+
+​1. Добавление нового сотрудника
+   
+#+begin_src sql :engine mysql :database computerserviceooo
+INSERT INTO employee (last_name, first_name, second_name, date_of_birth, sex, address, phone_number, passport_details,
+                      position_id)
+VALUES ('Викторов', 'Кузьма', 'Васидьевич', '2004-01-24', 1, 'г. Санкт-Петербург', '+71111111187', '1111 111111', 6);
+#+end_src
+
+#+RESULTS:
+|---|
+
+#+CAPTION: Результаты выполнения первого запроса на добавление
+[[file:images/20230124-123607_screenshot.png]]
+
+​2. Добавление новой услуги
+#+begin_src sql :engine mysql :database computerserviceooo
+INSERT INTO service (name, cost)  VALUES ('Установка игр', 10000);
+#+end_src
+
+#+RESULTS:
+|---|
+
+#+CAPTION: Результаты выполнения второго запроса на добавления
+[[file:images/20230124-123947_screenshot.png]]
+
+
+2 запроса на удаление;
+
+​1. Удаление сотрудника, с самым коротким адресом
+#+begin_src sql :engine mysql :database computerserviceooo
+DELETE FROM employee WHERE LENGTH(address) = (SELECT m FROM (SELECT MIN(LENGTH(address)) as m FROM employee) AS cringe);
+#+end_src
+
+#+RESULTS:
+|---|
+
+#+CAPTION: До первого запроса на удаление
+[[file:images/20230124-124655_screenshot.png]]
+
+#+CAPTION: После первого запроса на удаление
+[[file:images/20230124-125400_screenshot.png]]
+
+​2. В связи законами о браке, запрете ЛГБТ и т.п., удалите все полы, кроме =Мужской= и =Женский=.
+#+begin_src sql :engine mysql :database computerserviceooo
+DELETE FROM sex WHERE name NOT IN ('Мужской', 'Женский');
+#+end_src
+
+#+RESULTS:
+|---|
+
+#+CAPTION: До второго запроса на удаление
+[[file:images/20230124-125655_screenshot.png]]
+
+#+CAPTION: После второго запроса на удаление
+[[file:images/20230124-125830_screenshot.png]]
+
+2 запроса на изменение;
+
+​1. В мире кризис в IT, поэтому уменьшите зарплату всем сотрудника на 40%, но директору увеличьте на 100%.
+
+#+begin_src sql :engine mysql :database computerserviceooo
+UPDATE position SET salary = IF(name = 'Директор', salary * 2, salary * 0.6);
+#+end_src
+
+#+RESULTS:
+|---|
+
+#+CAPTION: До выполнения первого запроса на изменение
+[[file:images/20230124-130650_screenshot.png]]
+
+#+CAPTION: После выполнения первого запроса на изменение
+[[file:images/20230124-130753_screenshot.png]]
+
+​2. Всё таки закон об замене англицизмов приняли,
+поэтому ко всем незнакомым нам слова в типах устройств добавить описание "Мы сами не знаем, что это такое",
+кроме слова Мышка.
+
+#+begin_src sql  :engine mysql :database computerserviceooo
+UPDATE type SET description = 'Мы сами не знаем, что это такое' WHERE name != 'Мышка';
+#+end_src
+
+#+RESULTS:
+|---|
+
+
+#+CAPTION: До выполнения второго запроса на изменение
+[[file:images/20230124-131915_screenshot.png]]
+
+#+CAPTION: До выполнения второго запроса на изменение
+[[file:images/20230124-132010_screenshot.png]]
+
+
+
+2 запроса с использованием статистических функций;
+
+​1. Необходимо найти покупателя, который потратил у нас больше всех денег.
+
+#+begin_src sql :engine mysql :database computerserviceooo
+SELECT CONCAT_WS(' ', c.last_name, c.first_name, c.second_name) as ФИО, SUM(s.cost) + SUM(c2.price) as 'Потраченные деньги'
+FROM `order`
+         JOIN customer c on c.id = `order`.customer_id
+         JOIN order_components oc on `order`.id = oc.order_id
+         JOIN orders_services os on `order`.id = os.order_id
+         JOIN service s on s.id = os.service_id
+         JOIN component c2 on c2.id = oc.component_id
+GROUP BY customer_id
+ORDER BY SUM(s.cost) + SUM(c2.price) DESC LIMIT 1;
+#+end_src
+
+#+RESULTS:
+| ФИО                      | Потраченные деньги |
+|--------------------------+--------------------|
+| Гамуйло Сергей Сергеевич |             131000 |
+
+
+#+CAPTION: Результат выполнения запрсоса
+[[file:images/20230210-123410_screenshot.png]]
+
+​2. Найдите среднюю цену всего что есть у нас в магазине
+
+#+begin_src sql :engine mysql :database computerserviceooo
+SELECT (s_count_sum.s + c_count_sum.su) / (c_count_sum.co + s_count_sum.c) as "Средняя цена всего"
+FROM (SELECT SUM(price) su, COUNT(*) co FROM component) c_count_sum join (SELECT SUM(cost) as s, COUNT(*) as c  FROM service) s_count_sum ON TRUE;
+#+end_src
+
+#+RESULTS:
+| Средняя цена всего |
+|--------------------|
+|         81378.5714 |
+
+
+#+CAPTION: Результа выполнения запроса
+[[file:images/20230213-114708_screenshot.png]]
+
+
+Число полученное на калькуляторе:
+#+begin_src emacs-lisp :exports results :eval no-export :results value 
+(calc-eval "(103300 + 1036000) / 14")
+#+end_src
+
+#+RESULTS:
+: 81378.5714286
+
+
+
+2 запроса с использованием строковых функций;
+
+#+begin_src sql :engine mysql :database computerserviceooo
+SELECT CONCAT_WS('', t.id, LEFT(t.name, 1), LEFT(m.name, 1), LEFT(brand, 1)) as Артикул
+FROM component
+         JOIN type t on t.id = component.type_id
+         JOIN manufacturer m on m.id = component.manufacturer_id;
+#+end_src
+
+#+RESULTS:
+| Артикул |
+|---------|
+| 1ПAR    |
+| 2ВAR    |
+| 3HSI    |
+| 4SKA    |
+| 5КZi    |
+| 3HAT    |
+| 1ПIi    |
+| 2ВAА    |
+
+
+#+CAPTION: Результат выполнения запроса
+[[file:images/20230213-125802_screenshot.png]]
